@@ -1,23 +1,28 @@
 ﻿using NUnit.Framework;
+using NUnit.Framework.Internal;
 using OpenQA.Selenium;
 using SeleniumTestbase;
+using Assert = NUnit.Framework.Assert;
 
 namespace UiTests
 {
-    public class Testcases : TestBase
+    [TestFixture(BrowserType.Chrome)]
+    [TestFixture(BrowserType.Firefox)]
+    [TestFixture(BrowserType.Edge)]
+    public class Testcases(BrowserType browser) : TestBase(browser)
     {
-        [Test]
+        [TestCase]
         public void UnregisteredUsersCanPlaceOrders()
         {
-            IWebDriver driver = Browser.Driver;
+            IWebDriver? driver = _session?.Driver; ;
 
-            Headers header = new Headers(driver);
-            WomenJacketsCategory womenJacketsCategory = new WomenJacketsCategory(driver);
-            Checkout checkout = new Checkout(driver);
+            Headers header = new Headers(driver, _session);
+            WomenJacketsCategory womenJacketsCategory = new WomenJacketsCategory(driver, _session);
+            Checkout checkout = new Checkout(driver, _session);
 
             header.WaitToLoad();
             
-            Browser.NavigateToMenu(MenuIds.Women, MenuIds.Tops,MenuIds.Jackets);
+            _session?.NavigateToMenu(MenuIds.Women, MenuIds.Tops,MenuIds.Jackets);
             
             womenJacketsCategory.WaitToLoad();
 
@@ -54,7 +59,7 @@ namespace UiTests
 
             checkout.PlaceOrder();
 
-            Assert.That(driver.Url, Is.EqualTo("https://magento.softwaretestingboard.com/checkout/onepage/success/"));
+            Assert.That(driver?.Url, Is.EqualTo("https://magento.softwaretestingboard.com/checkout/onepage/success/"));
             Assert.That(checkout.GetPageTitle(), Is.EqualTo("Thank you for your purchase!"));
 
         }

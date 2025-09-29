@@ -1,76 +1,73 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 
 namespace SeleniumTestbase
 {
-    public partial class Checkout(IWebDriver driver )
+    public partial class Checkout(IWebDriver? driver, BrowserSession? session)
     {
-        readonly Actions _actions = new Actions(driver);
-
         public Checkout WaitToLoad()
         {
-            Browser.Wait().Until(drv => drv.FindElements(By.CssSelector(".loading-mask")).All(e => !e.Displayed));
-            Browser.Wait().Until(drv => GetElement(_email).Displayed);
+            session?.Wait().Until(drv => drv.FindElements(By.CssSelector(".loading-mask")).All(e => !e.Displayed));
+            session?.Wait().Until(drv => GetElement(_email)?.Displayed);
 
             return this;
         }
 
         public void InputEmail(string email)
         {
-            GetElement(_email).SendKeys(email);
+            GetElement(_email)?.SendKeys(email);
         }
 
         public void InputFirstName(string firstName)
         {
-            GetElement(_firstName).SendKeys(firstName);
+            GetElement(_firstName)?.SendKeys(firstName);
         }
 
         public void InputLastName(string lastname)
         {
-            GetElement(_lastname).SendKeys(lastname);
+            GetElement(_lastname)?.SendKeys(lastname);
         }
         public void InputAddress(string address)
         {
-            GetElement(_address).SendKeys(address);
+            GetElement(_address)?.SendKeys(address);
         }
         public void InputCity(string city)
         {
-            GetElement(_city).SendKeys(city);
+            GetElement(_city)?.SendKeys(city);
         }
         public void SelectState(string name)
         {
-            IWebElement dropdown = GetElement(_stateSelector);
-            dropdown.Click();
+            IWebElement? dropdown = GetElement(_stateSelector);
+            dropdown?.Click();
             SelectElement select = new SelectElement(dropdown);
             select.SelectByText(name);
         }
         public void InputPostalCode(string postalCode)
         {
-            GetElement(_postalCode).SendKeys(postalCode);
+            GetElement(_postalCode)?.SendKeys(postalCode);
         }
         public void InputPhoneNumber(string phoneNumber)
         {
-            GetElement(_phoneNumber).SendKeys(phoneNumber);
+            GetElement(_phoneNumber)?.SendKeys(phoneNumber);
         }
 
         public void GotToReviewAndPayments()
         {
-            GetElement(_nextButton).Click();
-            Browser.Wait().Until(drv => drv.FindElements(By.CssSelector(".loading-mask")).All(e => !e.Displayed));
-            Browser.Wait().Until(drv => GetElement(_placeOrder).Displayed);
+            GetElement(_nextButton)?.Click();
+            session?.Wait().Until(drv => drv.FindElements(By.CssSelector(".loading-mask")).All(e => !e.Displayed));
+            session?.Wait().Until(drv => GetElement(_placeOrder)?.Displayed);
         }
 
 
         public void PlaceOrder()
         {
-            GetElement(_placeOrder).Click();
-            Browser.Wait().Until(drv => drv.FindElements(By.CssSelector(".loading-mask")).All(e => !e.Displayed));
+            GetElement(_placeOrder)?.Click();
+            session?.Wait().Until(drv => drv.FindElements(By.CssSelector(".loading-mask")).All(e => !e.Displayed));
         }
 
-        public string GetPageTitle()
+        public string? GetPageTitle()
         {
-            return GetElement(_pageTitle).Text;
+            return GetElement(_pageTitle)?.Text;
         }
 
 
@@ -78,11 +75,11 @@ namespace SeleniumTestbase
         {
             if (cheap)
             {
-                GetElement(_radioTableRate).Click();
+                GetElement(_radioTableRate)?.Click();
             }
             else
             {
-                GetElement(_radioFixed).Click();
+                GetElement(_radioFixed)?.Click();
             }
         }
 
@@ -94,11 +91,11 @@ namespace SeleniumTestbase
         /// </summary>
         /// <param name="locator">The locator.</param>
         /// <returns>IWebElement.</returns>
-        private IWebElement GetElement(By locator)
+        private IWebElement? GetElement(By locator)
         {
             try
             {
-                return driver.FindElement(locator);
+                return driver?.FindElement(locator);
             }
             catch (Exception)
             {

@@ -2,21 +2,21 @@
 
 namespace SeleniumTestbase
 {
-    public partial class Headers(IWebDriver driver)
+    public partial class Headers(IWebDriver? driver, BrowserSession? session)
     {
         public Headers WaitToLoad()
         {
-            Browser.Wait().Until(drv => GetElement(_consentFormDismiss).Displayed);
+            session?.Wait().Until(drv => GetElement(_consentFormDismiss).Displayed);
             GetElement(_consentFormDismiss).Click();
-            Browser.Wait().Until(drv => drv.FindElements(By.CssSelector(".loading-mask")).All(e => !e.Displayed));
-            Browser.Wait().Until(drv => GetElement(_womenMenu).Displayed);
+            session.Wait().Until(drv => drv.FindElements(By.CssSelector(".loading-mask")).All(e => !e.Displayed));
+            session.Wait().Until(drv => GetElement(_womenMenu).Displayed);
             return this;
         }
 
         public void ClickSignIn()
         {
             GetElement(_signIn).Click();
-            Browser.Wait().Until(drv =>
+            session?.Wait().Until(drv =>
                 drv.Url.Contains(
                     "https://magento.softwaretestingboard.com/customer/account/login/"));
         }
@@ -27,7 +27,7 @@ namespace SeleniumTestbase
             {
                 GetElement(_cartButton).Click();
             }
-            Browser.Wait().Until(drv => GetElement(_itemsTotal).Displayed);
+            session?.Wait().Until(drv => GetElement(_itemsTotal).Displayed);
             string itemsTotalText = GetElement(_itemsTotal).Text;
             string numberOnly = System.Text.RegularExpressions.Regex.Match(itemsTotalText, @"\d+").Value;
 
@@ -41,7 +41,7 @@ namespace SeleniumTestbase
             {
                 GetElement(_cartButton).Click();
             }
-            Browser.Wait().Until(drv => GetElement(_priceTotal).Displayed);
+            session?.Wait().Until(drv => GetElement(_priceTotal).Displayed);
             string itemsTotalText = GetElement(_priceTotal).Text;
 
             return itemsTotalText;

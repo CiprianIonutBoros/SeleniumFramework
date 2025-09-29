@@ -1,21 +1,22 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
+using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace SeleniumTestbase
 {
-    public partial class WomenJacketsCategory(IWebDriver driver)
+    public partial class WomenJacketsCategory(IWebDriver? driver, BrowserSession? session)
     {
         readonly Actions _actions = new Actions(driver);
 
         public WomenJacketsCategory WaitToLoad()
         {
-            Browser.Wait().Until(drv => GetElement(_pageTitle).Text.Contains("Jackets", StringComparison.InvariantCultureIgnoreCase));
+            session.Wait().Until(drv => GetElement(_pageTitle).Text.Contains("Jackets", StringComparison.InvariantCultureIgnoreCase));
             return this;
         }
 
         public void AddProductToCart(string product, string color, string size)
         {
-            Headers headers = new Headers(driver);
+            Headers headers = new Headers(driver, session);
             int initialCartCounter = headers.GetCartCounterNumber();
 
             IWebElement selectedProduct = GetElement(GetProductItem(product));
@@ -25,7 +26,7 @@ namespace SeleniumTestbase
             _actions.MoveToElement(selectedProduct);
             selectedProduct.FindElement(_addToCartButton).Click();
 
-            Browser.Wait().Until(drv =>headers.GetCartCounterNumber() == initialCartCounter + 1);
+            session.Wait().Until(drv =>headers.GetCartCounterNumber() == initialCartCounter + 1);
         }
 
         private void SelectSize(string size, IWebElement product)
@@ -47,7 +48,7 @@ namespace SeleniumTestbase
         /// </summary>
         /// <param name="locator">The locator.</param>
         /// <returns>IWebElement.</returns>
-        private IWebElement GetElement(By locator)
+        private IWebElement? GetElement(By locator)
         {
             try
             {

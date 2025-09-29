@@ -20,4 +20,10 @@
     <ProjectReference Include="..\SeleniumTestbase\SeleniumTestbase.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<None Include="..\SeleniumTestbase\browserSettings.json" Link="browserSettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
 </Project>

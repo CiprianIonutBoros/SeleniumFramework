@@ -1,0 +1,48 @@
+{
+  "baseUrl": "https://magento.softwaretestingboard.com/",
+  "defaultBrowser": "chrome",
+
+  "browsers": {
+    "chrome": {
+      "headless": {
+        "debug": false,
+        "server": true
+      },
+      "windowSize": "1920,1080",
+      "acceptInsecureCertificates": true,
+      "arguments": [
+        "--disable-search-engine-choice-screen",
+        "--disable-extensions"
+      ]
+    },
+
+    "firefox": {
+      "headless": {
+        "debug": false,
+        "server": true
+      },
+      "windowSize": "1920,1080",
+      "acceptInsecureCertificates": true,
+      "arguments": [
+        "-private"
+      ]
+    },
+
+    "edge": {
+      "headless": {
+        "debug": false,
+        "server": true
+      },
+      "windowSize": "1920,1080",
+      "acceptInsecureCertificates": true,
+      "arguments": [
+        "--disable-extensions"
+      ]
+    }
+  },
+
+  "timeouts": {
+    "implicitMs": 0,
+    "pageLoadMs": 60000
+  }
+}

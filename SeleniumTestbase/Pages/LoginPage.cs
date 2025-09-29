@@ -2,11 +2,11 @@
 
 namespace SeleniumTestbase
 {
-    public partial class LoginPage(IWebDriver driver)
+    public partial class LoginPage(IWebDriver driver, BrowserSession? session)
     {
         public LoginPage WaitToLoad()
         {
-            Browser.Wait().Until(drv => GetElement(_signInButton).Displayed);
+            session.Wait().Until(drv => GetElement(_signInButton).Displayed);
             return this;
         }
 
@@ -22,7 +22,7 @@ namespace SeleniumTestbase
 
             GetElement(_signInButton).Click();
 
-            Browser.Wait().Until(drv => drv.Url.Equals("https://magento.softwaretestingboard.com/"));
+            session?.Wait().Until(drv => drv.Url.Equals("https://magento.softwaretestingboard.com/"));
         }
 
 
