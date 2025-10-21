@@ -1,13 +1,10 @@
 ﻿using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.DevTools;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
+using LogEntry = OpenQA.Selenium.LogEntry;
 
 namespace SeleniumTestbase
 {
@@ -24,55 +21,77 @@ namespace SeleniumTestbase
                 case BrowserType.Firefox:
                     return Finish(new FirefoxDriver(BuildFirefox(profile, headless)), settings, profile);
                 case BrowserType.Edge:
-                    return Finish(new EdgeDriver(BuildEdge(profile, headless)), settings, profile);
+                    return Finish(CreateEdge(profile, headless), settings, profile);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
 
-        public static (BrowserType name, BrowserProfile profile, bool headless)
-            Select(BrowserSettings? s, BrowserType fromFixture)
+        public static (BrowserProfile profile, bool headless) Select(BrowserSettings? s, BrowserType fromFixture)
         {
-            // BrowserType from the fixture param
-            BrowserType name = fromFixture;
-
             // Dictionary is keyed by strings like "chrome", so we convert
-            string key = name.ToString().ToLowerInvariant();
-            BrowserProfile? p = s?.Browsers[key];
+            string key = fromFixture.ToString().ToLowerInvariant();
+            BrowserProfile? browserProfile = s?.Browsers[key];
+            
+            if (browserProfile == null)
+            {
+                string? available = string.Join(", ", s?.Browsers.Keys.ToArray() ?? []);
+                throw new ArgumentException(
+                    $"Browser profile '{key}' not found in browserSettings.json. Available: {available}");
+            }
 
             // Headless based on environment
             bool isServer = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI"));
-            bool h = isServer ? p.Headless.Server : p.Headless.Debug;
+            bool isHeadless = isServer ? browserProfile.Headless.Server : browserProfile.Headless.Debug;
 
-            return (name, p, h);
+            return (browserProfile, isHeadless);
         }
 
-        static ChromeOptions BuildChrome(BrowserProfile p, bool headless)
+        static ChromeOptions BuildChrome(BrowserProfile browserProfile, bool headless)
         {
-            ChromeOptions o = new ChromeOptions { AcceptInsecureCertificates = p.AcceptInsecureCertificates };
-            if (headless) o.AddArgument("--headless=new");
-            o.AddArgument($"--window-size={p.WindowSize}");
-            foreach (string a in p.Arguments) o.AddArgument(a);
-            return o;
+            ChromeOptions chromeOptions = new ChromeOptions { AcceptInsecureCertificates = browserProfile.AcceptInsecureCertificates };
+            if (headless) chromeOptions.AddArgument("--headless=new");
+            chromeOptions.AddArgument($"--window-size={browserProfile.WindowSize}");
+            foreach (string a in browserProfile.Arguments) chromeOptions.AddArgument(a);
+            return chromeOptions;
         }
 
-        static FirefoxOptions BuildFirefox(BrowserProfile p, bool headless)
+        static FirefoxOptions BuildFirefox(BrowserProfile browserProfile, bool headless)
         {
-            FirefoxOptions o = new FirefoxOptions { AcceptInsecureCertificates = p.AcceptInsecureCertificates };
-            if (headless) o.AddArgument("--headless");
-            foreach (string a in p.Arguments) o.AddArgument(a);
-            return o;
+            FirefoxOptions firefoxOptions = new FirefoxOptions { AcceptInsecureCertificates = browserProfile.AcceptInsecureCertificates };
+            if (headless) firefoxOptions.AddArgument("--headless");
+            foreach (string a in browserProfile.Arguments) firefoxOptions.AddArgument(a);
+            return firefoxOptions;
         }
 
         static EdgeOptions BuildEdge(BrowserProfile p, bool headless)
         {
-            EdgeOptions o = new EdgeOptions();
-            if (headless) o.AddArgument("--headless=new");
-            o.AddArgument($"--window-size={p.WindowSize}");
-            foreach (string a in p.Arguments) o.AddArgument(a);
-            return o;
+            EdgeOptions edgeOptions = new EdgeOptions();
+            if (headless) edgeOptions.AddArgument("--headless=new");
+            edgeOptions.AddArgument($"--window-size={p.WindowSize}");
+            foreach (string a in p.Arguments) edgeOptions.AddArgument(a);
+            return edgeOptions;
         }
 
+        static IWebDriver CreateEdge(BrowserProfile p, bool headless)
+        {
+            var options = BuildEdge(p, headless);
+
+            // The Selenium.WebDriver.MSEdgeDriver NuGet drops msedgedriver.exe here:
+            var driverDir = AppContext.BaseDirectory;
+            var driverExe = Path.Combine(driverDir, "msedgedriver.exe");
+
+            if (!File.Exists(driverExe))
+                throw new FileNotFoundException($"msedgedriver.exe not found in {driverDir}. " +
+                                                "Ensure Selenium.WebDriver.MSEdgeDriver is installed in the test project and the build is up-to-date.");
+
+            var service = EdgeDriverService.CreateDefaultService(driverDir);
+            // (optional) quiet logs:
+            // service.UseVerboseLogging = false;
+            // service.LogPath = Path.Combine(driverDir, "edgedriver.log");
+
+            return new EdgeDriver(service, options);
+        }
 
         static IWebDriver Finish(IWebDriver d, BrowserSettings? s, BrowserProfile p)
         {

@@ -1,32 +1,29 @@
-﻿using Newtonsoft.Json;
-using NUnit.Framework;
-using OpenQA.Selenium.Chrome;
-using System;
-using System.Diagnostics;
+﻿using NUnit.Framework;
 using OpenQA.Selenium;
+using System.Text.Json;
 using TestContext = NUnit.Framework.TestContext;
 
 namespace SeleniumTestbase
 {
     public abstract class TestBase(BrowserType browser)
     {
-        protected BrowserSession? _session;
+        protected BrowserSession? Session;
         private BrowserSettings? _browserSettings;
 
         [SetUp]
         public void SetUp()
         {
             _browserSettings = LoadBrowserSettings();
-            (BrowserType name, BrowserProfile profile, bool headless) = DriverFactory.Select(this._browserSettings, browser);
-            IWebDriver driver = DriverFactory.Create(name, _browserSettings, profile, headless);
-            _session = new BrowserSession(driver);
-            _session.Navigate(_browserSettings?.BaseUrl);
+            (BrowserProfile profile, bool headless) = DriverFactory.Select(this._browserSettings, browser);
+            IWebDriver driver = DriverFactory.Create(browser, _browserSettings, profile, headless);
+            Session = new BrowserSession(driver);
+            Session.Navigate(_browserSettings?.BaseUrl);
         }
 
         [TearDown]
         public void TearDown()
         {
-            _session?.Dispose();
+            Session?.Dispose();
         }
 
         private static BrowserSettings? LoadBrowserSettings()
@@ -36,7 +33,10 @@ namespace SeleniumTestbase
             string jsonText = File.ReadAllText(path);
 
             // deserialize into the class
-            BrowserSettings? settings = JsonConvert.DeserializeObject<BrowserSettings>(jsonText);
+            BrowserSettings? settings = JsonSerializer.Deserialize<BrowserSettings>(jsonText, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
 
             return settings;
         }

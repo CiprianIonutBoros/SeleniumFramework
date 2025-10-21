@@ -1,0 +1,29 @@
+<Project>
+	<PropertyGroup>
+		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Test stack -->
+		<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+		<PackageVersion Include="NUnit" Version="4.3.2" />
+		<PackageVersion Include="NUnit3TestAdapter" Version="5.0.0" />
+
+		<!-- Selenium -->
+		<PackageVersion Include="Selenium.WebDriver" Version="4.34.0" />
+		<PackageVersion Include="Selenium.Support" Version="4.34.0" />
+		<PackageVersion Include="Selenium.WebDriver.ChromeDriver" Version="138.0.7204.16800" />
+		<PackageVersion Include="Selenium.WebDriver.MSEdgeDriver" Version="140.0.3485.66" />
+		<!-- Add if you run Firefox -->
+		<PackageVersion Include="Selenium.WebDriver.GeckoDriver" Version="0.35.0" />
+
+		<!-- Helpers (often used but were not listed) -->
+		<PackageVersion Include="DotNetSeleniumExtras.WaitHelpers" Version="3.11.0" />
+		<PackageVersion Include="FluentAssertions" Version="6.12.0" />
+		<PackageVersion Include="RestSharp" Version="112.3.0" />
+		<PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+
+		<!-- Coverage/diagnostics (optional) -->
+		<PackageVersion Include="coverlet.collector" Version="6.0.0" />
+	</ItemGroup>
+</Project>

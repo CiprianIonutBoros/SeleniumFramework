@@ -17,19 +17,14 @@ namespace SeleniumTestbase
         public string BaseUrl { get; set; } = string.Empty;
 
         /// <summary>
-        /// Default browser to use if none specified
-        /// </summary>
-        public string DefaultBrowser { get; set; } = "chrome";
-
-        /// <summary>
         /// All browser profiles: chrome, firefox, edge
         /// </summary>
-        public Dictionary<string, BrowserProfile> Browsers { get; set; } = new();
+        public Dictionary<string, BrowserProfile> Browsers { get; init; } = new();
 
         /// <summary>
         /// Global timeout settings
         /// </summary>
-        public TimeoutConfig Timeouts { get; set; } = new();
+        public TimeoutConfig Timeouts { get; init; } = new();
     }
 
     /// <summary>

@@ -1,0 +1,34 @@
+{
+  "Users": [
+    {
+      "Username": "standard_user",
+      "Password": "secret_sauce",
+      "Type": "Standard"
+    },
+    {
+      "Username": "locked_out_user",
+      "Password": "secret_sauce",
+      "Type": "Locked"
+    },
+    {
+      "Username": "problem_user",
+      "Password": "secret_sauce",
+      "Type": "Problematic"
+    },
+    {
+      "Username": "performance_glitch_user",
+      "Password": "secret_sauce",
+      "Type": "Glitch"
+    },
+    {
+      "Username": "error_user",
+      "Password": "secret_sauce",
+      "Type": "Error"
+    },
+    {
+      "Username": "visual_user",
+      "Password": "secret_sauce",
+      "Type": "Visual"
+    }
+  ]
+}

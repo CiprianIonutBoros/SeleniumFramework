@@ -1,6 +1,5 @@
 {
-  "baseUrl": "https://magento.softwaretestingboard.com/",
-  "defaultBrowser": "chrome",
+  "baseUrl": "https://www.saucedemo.com/",
 
   "browsers": {
     "chrome": {
@@ -12,7 +11,10 @@
       "acceptInsecureCertificates": true,
       "arguments": [
         "--disable-search-engine-choice-screen",
-        "--disable-extensions"
+        "--disable-extensions",
+        "--disable-popup-blocking",
+        "--disable-notifications",
+        "--blink-settings=imagesEnabled=false"
       ]
     },
 
@@ -24,7 +26,9 @@
       "windowSize": "1920,1080",
       "acceptInsecureCertificates": true,
       "arguments": [
-        "-private"
+        "-private",
+        "--disable-popup-blocking",
+        "--disable-notifications"
       ]
     },
 
@@ -36,7 +40,10 @@
       "windowSize": "1920,1080",
       "acceptInsecureCertificates": true,
       "arguments": [
-        "--disable-extensions"
+        "--disable-extensions",
+        "--disable-popup-blocking",
+        "--disable-notifications",
+        "--blink-settings=imagesEnabled=false"
       ]
     }
   },
