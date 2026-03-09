@@ -1,10 +1,7 @@
 ﻿using OpenQA.Selenium;
-using System.Drawing;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.DevTools;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
-using LogEntry = OpenQA.Selenium.LogEntry;
 
 namespace SeleniumTestbase
 {
@@ -12,16 +9,16 @@ namespace SeleniumTestbase
 
     public class DriverFactory
     {
-        public static IWebDriver Create(BrowserType type, BrowserSettings? settings, BrowserProfile profile, bool headless)
+        public static IWebDriver Create(BrowserType type, BrowserSettings? settings, BrowserProfile profile, bool headless, SlotLayout? slot = null)
         {
             switch (type)
             {
                 case BrowserType.Chrome:
-                    return Finish(new ChromeDriver(BuildChrome(profile, headless)), settings, profile);
+                    return Finish(new ChromeDriver(BuildChrome(profile, headless, slot)), type, settings, slot);
                 case BrowserType.Firefox:
-                    return Finish(new FirefoxDriver(BuildFirefox(profile, headless)), settings, profile);
+                    return Finish(new FirefoxDriver(BuildFirefox(profile, headless, slot)), type, settings, slot);
                 case BrowserType.Edge:
-                    return Finish(CreateEdge(profile, headless), settings, profile);
+                    return Finish(CreateEdge(profile, headless, slot), type, settings, slot);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
@@ -29,81 +26,110 @@ namespace SeleniumTestbase
 
         public static (BrowserProfile profile, bool headless) Select(BrowserSettings? s, BrowserType fromFixture)
         {
-            // Dictionary is keyed by strings like "chrome", so we convert
             string key = fromFixture.ToString().ToLowerInvariant();
             BrowserProfile? browserProfile = s?.Browsers[key];
-            
+
             if (browserProfile == null)
             {
-                string? available = string.Join(", ", s?.Browsers.Keys.ToArray() ?? []);
+                string available = string.Join(", ", s?.Browsers.Keys.ToArray() ?? []);
                 throw new ArgumentException(
                     $"Browser profile '{key}' not found in browserSettings.json. Available: {available}");
             }
 
-            // Headless based on environment
             bool isServer = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CI"));
             bool isHeadless = isServer ? browserProfile.Headless.Server : browserProfile.Headless.Debug;
 
             return (browserProfile, isHeadless);
         }
 
-        static ChromeOptions BuildChrome(BrowserProfile browserProfile, bool headless)
+        static ChromeOptions BuildChrome(BrowserProfile browserProfile, bool headless, SlotLayout? slot)
         {
             ChromeOptions chromeOptions = new ChromeOptions { AcceptInsecureCertificates = browserProfile.AcceptInsecureCertificates };
             if (headless) chromeOptions.AddArgument("--headless=new");
-            chromeOptions.AddArgument($"--window-size={browserProfile.WindowSize}");
+
+            // Use slot layout for size/position so browser opens directly in place
+            if (slot != null)
+            {
+                chromeOptions.AddArgument(slot.WindowSizeArg);
+                chromeOptions.AddArgument(slot.WindowPositionArg);
+            }
+            else
+            {
+                chromeOptions.AddArgument($"--window-size={browserProfile.WindowSize}");
+            }
+
             foreach (string a in browserProfile.Arguments) chromeOptions.AddArgument(a);
+
+            chromeOptions.AddUserProfilePreference("credentials_enable_service", false);
+            chromeOptions.AddUserProfilePreference("profile.password_manager_enabled", false);
+            chromeOptions.AddUserProfilePreference("profile.password_manager_leak_detection", false);
+
             return chromeOptions;
         }
 
-        static FirefoxOptions BuildFirefox(BrowserProfile browserProfile, bool headless)
+        static FirefoxOptions BuildFirefox(BrowserProfile browserProfile, bool headless, SlotLayout? slot)
         {
             FirefoxOptions firefoxOptions = new FirefoxOptions { AcceptInsecureCertificates = browserProfile.AcceptInsecureCertificates };
             if (headless) firefoxOptions.AddArgument("--headless");
+
+            // Firefox supports --width/--height but not --window-position as launch args
+            if (slot != null)
+            {
+                firefoxOptions.AddArgument($"--width={slot.Width}");
+                firefoxOptions.AddArgument($"--height={slot.Height}");
+            }
+
             foreach (string a in browserProfile.Arguments) firefoxOptions.AddArgument(a);
             return firefoxOptions;
         }
 
-        static EdgeOptions BuildEdge(BrowserProfile p, bool headless)
+        static EdgeOptions BuildEdge(BrowserProfile p, bool headless, SlotLayout? slot)
         {
             EdgeOptions edgeOptions = new EdgeOptions();
             if (headless) edgeOptions.AddArgument("--headless=new");
-            edgeOptions.AddArgument($"--window-size={p.WindowSize}");
+
+            // Use slot layout for size/position so browser opens directly in place
+            if (slot != null)
+            {
+                edgeOptions.AddArgument(slot.WindowSizeArg);
+                edgeOptions.AddArgument(slot.WindowPositionArg);
+            }
+            else
+            {
+                edgeOptions.AddArgument($"--window-size={p.WindowSize}");
+            }
+
             foreach (string a in p.Arguments) edgeOptions.AddArgument(a);
+
+            edgeOptions.AddUserProfilePreference("credentials_enable_service", false);
+            edgeOptions.AddUserProfilePreference("profile.password_manager_enabled", false);
+            edgeOptions.AddUserProfilePreference("profile.password_manager_leak_detection", false);
+
             return edgeOptions;
         }
 
-        static IWebDriver CreateEdge(BrowserProfile p, bool headless)
+        static IWebDriver CreateEdge(BrowserProfile p, bool headless, SlotLayout? slot)
         {
-            var options = BuildEdge(p, headless);
-
-            // The Selenium.WebDriver.MSEdgeDriver NuGet drops msedgedriver.exe here:
-            var driverDir = AppContext.BaseDirectory;
-            var driverExe = Path.Combine(driverDir, "msedgedriver.exe");
-
-            if (!File.Exists(driverExe))
-                throw new FileNotFoundException($"msedgedriver.exe not found in {driverDir}. " +
-                                                "Ensure Selenium.WebDriver.MSEdgeDriver is installed in the test project and the build is up-to-date.");
-
-            var service = EdgeDriverService.CreateDefaultService(driverDir);
-            // (optional) quiet logs:
-            // service.UseVerboseLogging = false;
-            // service.LogPath = Path.Combine(driverDir, "edgedriver.log");
-
+            EdgeOptions options = BuildEdge(p, headless, slot);
+            string driverDir = EdgeDriverResolver.GetDriverDirectory();
+            EdgeDriverService service = EdgeDriverService.CreateDefaultService(driverDir);
             return new EdgeDriver(service, options);
         }
 
-        static IWebDriver Finish(IWebDriver d, BrowserSettings? s, BrowserProfile p)
+        static IWebDriver Finish(IWebDriver d, BrowserType type, BrowserSettings? s, SlotLayout? slot)
         {
             d.Manage().Timeouts().ImplicitWait = TimeSpan.FromMilliseconds(s.Timeouts.ImplicitMs);
             d.Manage().Timeouts().PageLoad = TimeSpan.FromMilliseconds(s.Timeouts.PageLoadMs);
-            if (d is FirefoxDriver)
+
+            // Firefox doesn't support --window-position at launch, so apply it post-creation.
+            // Size is already correct from --width/--height, and position is set instantly
+            // before any navigation — no visible flash.
+            if (type == BrowserType.Firefox && slot != null)
             {
-                string[] sp = p.WindowSize.Split(',');
-                d.Manage().Window.Size = new Size(int.Parse(sp[0]), int.Parse(sp[1]));
+                WindowLayoutManager.ApplyPosition(d, slot);
             }
+
             return d;
         }
-
     }
 }

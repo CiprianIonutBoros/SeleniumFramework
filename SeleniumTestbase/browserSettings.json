@@ -1,4 +1,9 @@
 {
+  "environments": {
+    "dev": "https://www.saucedemo.com/",
+    "staging": "https://www.saucedemo.com/",
+    "production": "https://www.saucedemo.com/"
+  },
   "baseUrl": "https://www.saucedemo.com/",
 
   "browsers": {
@@ -14,7 +19,9 @@
         "--disable-extensions",
         "--disable-popup-blocking",
         "--disable-notifications",
-        "--blink-settings=imagesEnabled=false"
+        "--blink-settings=imagesEnabled=false",
+        "--disable-features=PasswordLeakDetection",
+        "--disable-save-password-bubble"
       ]
     },
 
@@ -43,7 +50,9 @@
         "--disable-extensions",
         "--disable-popup-blocking",
         "--disable-notifications",
-        "--blink-settings=imagesEnabled=false"
+        "--blink-settings=imagesEnabled=false",
+        "--disable-features=PasswordLeakDetection",
+        "--disable-save-password-bubble"
       ]
     }
   },

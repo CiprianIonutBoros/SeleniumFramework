@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SeleniumTestbase
+﻿namespace SeleniumTestbase
 {
     /// <summary>
     /// Root object of the JSON config file
@@ -12,9 +6,14 @@ namespace SeleniumTestbase
     public class BrowserSettings
     {
         /// <summary>
-        /// Base URL used by all tests
+        /// Base URL used by all tests (fallback when no environment is specified)
         /// </summary>
         public string BaseUrl { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Environment-specific base URLs keyed by name (dev, staging, production)
+        /// </summary>
+        public Dictionary<string, string> Environments { get; init; } = new();
 
         /// <summary>
         /// All browser profiles: chrome, firefox, edge

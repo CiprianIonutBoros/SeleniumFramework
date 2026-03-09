@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  CI/CD run settings for parallel Selenium test execution.
+  Used via: dotnet test ─s ci.runsettings
+  
+  Key settings:
+  - NumberOfTestWorkers: Max NUnit worker threads (matches LevelOfParallelism).
+  - DefaultTimeout: Per-test timeout in ms (2 minutes) to catch hung browsers.
+  - MaxCpuCount: Max parallel test assemblies (matches worker count).
+-->
+<RunSettings>
+  <NUnit>
+    <!-- Maximum number of parallel NUnit worker threads -->
+    <NumberOfTestWorkers>3</NumberOfTestWorkers>
+    <!-- Per-test timeout: 2 minutes to account for slow page loads -->
+    <DefaultTimeout>120000</DefaultTimeout>
+  </NUnit>
+  <RunConfiguration>
+    <!-- Maximum parallel test assemblies for vstest runner -->
+    <MaxCpuCount>3</MaxCpuCount>
+    <!-- Output directory for .trx result files -->
+    <ResultsDirectory>.\TestResults</ResultsDirectory>
+    <!-- Include source file/line info in test results for debugging -->
+    <CollectSourceInformation>true</CollectSourceInformation>
+  </RunConfiguration>
+</RunSettings>
