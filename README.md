@@ -8,53 +8,25 @@ A **Selenium UI test automation framework** built with **.NET 8**, **NUnit 4**, 
 
 ## 📁 Solution Structure
 
-TestFramework/
-│
-├── SeleniumTestbase/               # Reusable test framework library
-│   ├── Pages/                      # Page Object behavior (partial classes)
-│   │   ├── BasePage.cs             # Abstract base with shared element helpers
-│   │   ├── LoginPage.cs            # Login actions (enter credentials, submit)
-│   │   ├── InventoryPage.cs        # Product listing, sort, add/remove, logout
-│   │   ├── CartPage.cs             # Cart review, remove items, navigation
-│   │   ├── CheckoutStepOnePage.cs  # Customer info form + validation
-│   │   ├── CheckoutStepTwoPage.cs  # Order overview + pricing summary
-│   │   └── CheckoutCompletePage.cs # Confirmation + back home
-│   │
-│   ├── PageMaps/                   # Element locators (partial classes)
-│   │   ├── LoginPage.cs
-│   │   ├── InventoryPage.cs
-│   │   ├── CartPage.cs
-│   │   ├── CheckoutStepOnePage.cs
-│   │   ├── CheckoutStepTwoPage.cs
-│   │   └── CheckoutCompletePage.cs
-│   │
-│   ├── BrowserSession.cs           # WebDriver wrapper (navigate, wait, JS exec)
-│   ├── BrowserSettings.cs          # Config model for browserSettings.json
-│   ├── DriverFactory.cs            # Browser creation (Chrome, Firefox, Edge)
-│   ├── EdgeDriverResolver.cs       # Auto-downloads matching msedgedriver.exe
-│   ├── Log.cs                      # Timestamped test logger → NUnit TestContext
-│   ├── PageNavigator.cs            # Lazy page factory with per-type caching
-│   ├── RetryAttribute.cs           # [RetryOnFailure] for flaky tests
-│   ├── TestBase.cs                 # [SetUp]/[TearDown] + navigation helpers
-│   ├── TestData.cs                 # Centralized test constants
-│   ├── UserContainer.cs            # User model + UserType enum
-│   ├── UserProvider.cs             # Loads test users from Users.json
-│   ├── WindowLayoutManager.cs      # Tiles parallel browsers side-by-side
-│   ├── browserSettings.json        # Browser profiles, URLs, timeouts
-│   └── Users.json                  # Test user credentials
-│
-├── UiTests/                        # Test project (61 tests)
-│   ├── LoginTests.cs               # 6 tests  — all user type logins
-│   ├── InventoryTests.cs           # 12 tests — products, sorting, cart badge
-│   ├── CartTests.cs                # 10 tests — cart CRUD, badge, navigation
-│   ├── CheckoutTests.cs            # 24 tests — step 1/2 validation, complete
-│   ├── EndToEndTests.cs            # 9 tests  — full purchase flows
-│   ├── AssemblyInfo.cs             # [assembly: LevelOfParallelism(3)]
-│   └── ci.runsettings              # CI/CD run settings
-│
-├── Directory.Packages.props        # Central Package Management
-└── README.md
+```mermaid
+flowchart TD
 
+A[UiTests<br>Test Suites] --> B[TestBase<br>Test Lifecycle]
+
+B --> C[PageNavigator<br>Lazy Page Factory]
+C --> D[Page Objects<br>Pages]
+D --> E[PageMaps<br>Locators]
+
+D --> F[BrowserSession<br>Driver Utilities]
+F --> G[DriverFactory<br>Browser Creation]
+G --> H[WebDriver]
+
+H --> I[SauceDemo Application]
+
+B --> J[UserProvider / TestData]
+B --> K[browserSettings.json]
+B --> L[WindowLayoutManager]
+```
 ---
 
 ## 🚀 Getting Started
