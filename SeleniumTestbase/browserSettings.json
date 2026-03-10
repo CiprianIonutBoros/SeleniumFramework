@@ -15,6 +15,9 @@
       "windowSize": "1920,1080",
       "acceptInsecureCertificates": true,
       "arguments": [
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
         "--disable-search-engine-choice-screen",
         "--disable-extensions",
         "--disable-popup-blocking",
@@ -47,6 +50,9 @@
       "windowSize": "1920,1080",
       "acceptInsecureCertificates": true,
       "arguments": [
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
         "--disable-extensions",
         "--disable-popup-blocking",
         "--disable-notifications",

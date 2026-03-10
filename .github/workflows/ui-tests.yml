@@ -1,0 +1,94 @@
+﻿# ──────────────────────────────────────────────────────────────────────
+# Selenium UI Tests — GitHub Actions
+# Runs headless browser tests on every push/PR against main.
+# Chrome is pre-installed on ubuntu-latest. Firefox and Edge are
+# installed on-demand for their respective matrix jobs.
+# The CI env var triggers headless.server=true in browserSettings.json.
+# ──────────────────────────────────────────────────────────────────────
+
+name: UI Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: # Allow manual trigger from Actions tab
+
+env:
+  DOTNET_VERSION: "8.0.x"
+
+jobs:
+  test:
+    name: Selenium Tests (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [Chrome, Firefox, Edge]
+
+    steps:
+      # ── Checkout ──────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── .NET Setup ────────────────────────────────────────────
+      - name: Setup .NET ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # ── Browser Setup ─────────────────────────────────────────
+      - name: Install Firefox
+        if: matrix.browser == 'Firefox'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y firefox
+
+      - name: Install Edge
+        if: matrix.browser == 'Edge'
+        run: |
+          curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-edge.gpg
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-edge.gpg] https://packages.microsoft.com/repos/edge stable main" | sudo tee /etc/apt/sources.list.d/microsoft-edge.list
+          sudo apt-get update
+          sudo apt-get install -y microsoft-edge-stable
+
+      # ── Restore & Build ───────────────────────────────────────
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --no-restore --configuration Release
+
+      # ── Run Tests ─────────────────────────────────────────────
+      - name: Run UI tests (${{ matrix.browser }})
+        env:
+          BROWSER: ${{ matrix.browser }}
+          CI: "true"
+        run: |
+          dotnet test \
+            --no-build \
+            --configuration Release \
+            --settings UiTests/ci.runsettings \
+            --logger "trx;LogFileName=test-results.trx" \
+            --results-directory ./TestResults
+
+      # ── Upload Results ────────────────────────────────────────
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.browser }}
+          path: ./TestResults/
+          retention-days: 30
+
+      # ── Upload Screenshots ────────────────────────────────────
+      - name: Upload failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots-${{ matrix.browser }}
+          path: ./**/Screenshots/
+          retention-days: 30
