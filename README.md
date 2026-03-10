@@ -3,7 +3,7 @@
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![NUnit](https://img.shields.io/badge/NUnit-4.2.2-brightgreen)
 ![Selenium](https://img.shields.io/badge/Selenium-4.31.0-green)
-![Tests](https://img.shields.io/badge/Tests-61+-blue)
+[![NUnit Tests](https://github.com/BrownBear9208/TestFramework/actions/workflows/dotnet-tests.yml/badge.svg)](https://github.com/BrownBear9208/TestFramework/actions/workflows/dotnet-tests.yml)
 
 Enterprise-grade **Selenium UI test automation framework** for [SauceDemo](https://www.saucedemo.com/) built with **.NET 8**, **NUnit 4**, and the **Page Object Model** pattern.
 
