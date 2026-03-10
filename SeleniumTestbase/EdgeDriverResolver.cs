@@ -7,11 +7,12 @@ namespace SeleniumTestbase
     /// <summary>
     /// Resolves the correct msedgedriver for the installed Edge version
     /// by downloading it from Microsoft's Edgedriver API.
-    /// Supports Windows and Linux.
+    /// Supports Windows and Linux. Thread-safe for parallel test execution.
     /// </summary>
     public static class EdgeDriverResolver
     {
         private static readonly HttpClient Http = new();
+        private static readonly object DownloadLock = new();
         private static readonly string CacheRoot = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             ".edgedriver-cache");
@@ -19,6 +20,8 @@ namespace SeleniumTestbase
         /// <summary>
         /// Returns the directory path containing the msedgedriver binary matching the installed Edge version.
         /// Downloads the driver on first use and caches it for subsequent runs.
+        /// Uses a lock to prevent parallel threads from downloading/extracting simultaneously
+        /// (which causes "Text file busy" on Linux).
         /// </summary>
         public static string GetDriverDirectory()
         {
@@ -26,20 +29,29 @@ namespace SeleniumTestbase
             string driverDir = Path.Combine(CacheRoot, edgeVersion);
             string driverExe = Path.Combine(driverDir, GetDriverFileName());
 
+            // Fast path — already downloaded and ready
             if (File.Exists(driverExe))
                 return driverDir;
 
-            Directory.CreateDirectory(driverDir);
-            DownloadDriver(edgeVersion, driverDir);
-
-            if (!File.Exists(driverExe))
-                throw new FileNotFoundException(
-                    $"{GetDriverFileName()} was not found after download for Edge {edgeVersion}.");
-
-            // Ensure the binary is executable on Linux
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            // Slow path — only one thread downloads at a time
+            lock (DownloadLock)
             {
-                Process.Start("chmod", $"+x \"{driverExe}\"")?.WaitForExit();
+                // Double-check after acquiring lock (another thread may have finished)
+                if (File.Exists(driverExe))
+                    return driverDir;
+
+                Directory.CreateDirectory(driverDir);
+                DownloadDriver(edgeVersion, driverDir);
+
+                if (!File.Exists(driverExe))
+                    throw new FileNotFoundException(
+                        $"{GetDriverFileName()} was not found after download for Edge {edgeVersion}.");
+
+                // Ensure the binary is executable on Linux/macOS
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    Process.Start("chmod", $"+x \"{driverExe}\"")?.WaitForExit();
+                }
             }
 
             return driverDir;
@@ -51,19 +63,13 @@ namespace SeleniumTestbase
         private static string GetInstalledEdgeVersion()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
                 return GetEdgeVersionWindows();
-            }
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
                 return GetEdgeVersionLinux();
-            }
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
                 return GetEdgeVersionMac();
-            }
 
             throw new PlatformNotSupportedException("Unsupported OS for Edge driver resolution.");
         }

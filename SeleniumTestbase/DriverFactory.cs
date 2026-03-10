@@ -1,10 +1,14 @@
-﻿using OpenQA.Selenium;
+﻿using System.Runtime.InteropServices;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
 using OpenQA.Selenium.Firefox;
 
 namespace SeleniumTestbase
 {
+    /// <summary>
+    /// Creates and configures WebDriver instances for Chrome, Firefox, and Edge.
+    /// </summary>
     public enum BrowserType { Chrome, Firefox, Edge }
 
     public class DriverFactory
@@ -72,7 +76,15 @@ namespace SeleniumTestbase
             FirefoxOptions firefoxOptions = new FirefoxOptions { AcceptInsecureCertificates = browserProfile.AcceptInsecureCertificates };
             if (headless) firefoxOptions.AddArgument("--headless");
 
-            // Firefox supports --width/--height but not --window-position as launch args
+            // On Linux CI, the snap/apt Firefox binary may not be at the default path.
+            // Explicitly set the binary location so Selenium can find it.
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                string? firefoxPath = ResolveFirefoxBinaryLinux();
+                if (firefoxPath != null)
+                    firefoxOptions.BinaryLocation = firefoxPath;
+            }
+
             if (slot != null)
             {
                 firefoxOptions.AddArgument($"--width={slot.Width}");
@@ -130,6 +142,30 @@ namespace SeleniumTestbase
             }
 
             return d;
+        }
+
+        /// <summary>
+        /// Finds the Firefox binary on Linux. The apt-installed version lives at
+        /// /usr/bin/firefox, but snap-based installs or custom paths may differ.
+        /// </summary>
+        private static string? ResolveFirefoxBinaryLinux()
+        {
+            // Ordered by likelihood on GitHub Actions runners
+            string[] candidates =
+            [
+                "/usr/bin/firefox",
+                "/usr/bin/firefox-esr",
+                "/snap/bin/firefox",
+                "/usr/lib/firefox/firefox"
+            ];
+
+            foreach (string path in candidates)
+            {
+                if (File.Exists(path))
+                    return path;
+            }
+
+            return null;
         }
     }
 }
