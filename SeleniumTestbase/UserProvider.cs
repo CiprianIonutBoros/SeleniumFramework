@@ -4,7 +4,7 @@ using Newtonsoft.Json.Converters;
 namespace SeleniumTestbase
 {
     /// <summary>
-    /// Provides test user credentials by deserializing users.json on first access.
+    /// Provides test user credentials by deserializing Users.json on first access.
     /// Uses lazy initialization so the file is read only once per test run,
     /// and the result is shared across all parallel test instances.
     /// </summary>
@@ -20,14 +20,14 @@ namespace SeleniumTestbase
         };
 
         /// <summary>
-        /// Thread-safe lazy container that reads and deserializes users.json once.
+        /// Thread-safe lazy container that reads and deserializes Users.json once.
         /// </summary>
         private static readonly Lazy<UserContainer> Container = new(() =>
         {
-            string json = File.ReadAllText("users.json");
+            string json = File.ReadAllText("Users.json");
 
             return JsonConvert.DeserializeObject<UserContainer>(json, JsonSettings)
-                   ?? throw new InvalidOperationException("Failed to deserialize users.json.");
+                   ?? throw new InvalidOperationException("Failed to deserialize Users.json.");
         });
 
         /// <summary>
