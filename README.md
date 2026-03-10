@@ -3,10 +3,9 @@
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![NUnit](https://img.shields.io/badge/NUnit-4.2.2-brightgreen)
 ![Selenium](https://img.shields.io/badge/Selenium-4.31.0-green)
-[![NUnit Tests](https://github.com/BrownBear9208/TestFramework/actions/workflows/dotnet-tests.yml/badge.svg)](https://github.com/BrownBear9208/TestFramework/actions/workflows/dotnet-tests.yml)
+[![UI Tests](https://github.com/BrownBear9208/TestFramework/actions/workflows/ui-tests.yml/badge.svg)](https://github.com/BrownBear9208/TestFramework/actions/workflows/ui-tests.yml)
 
-Enterprise-grade **Selenium UI test automation framework** for [SauceDemo](https://www.saucedemo.com/) built with **.NET 8**, **NUnit 4**, and the **Page Object Model** pattern.
-
+A **Selenium UI test automation framework** built with **.NET 8**, **NUnit 4**, and the **Page Object Model** pattern. Designed for parallel execution, easy extensibility, and clean separation between test logic and infrastructure. > **Target application:** [SauceDemo](https://www.saucedemo.com/) — a demo e-commerce site by Sauce Labs.
 Designed for **parallel execution**, **clean architecture**, **easy extensibility**, and **clear separation between test logic and infrastructure**.
 
 **Repository:** https://github.com/BrownBear9208/TestFramework
