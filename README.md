@@ -1,18 +1,18 @@
-# 🧪 TestFramework — SauceDemo Selenium UI Automation
+# TestFramework — SauceDemo Selenium UI Automation
 
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![NUnit](https://img.shields.io/badge/NUnit-4.2.2-brightgreen)
 ![Selenium](https://img.shields.io/badge/Selenium-4.31.0-green)
-[![UI Tests](https://github.com/BrownBear9208/TestFramework/actions/workflows/ui-tests.yml/badge.svg)](https://github.com/BrownBear9208/TestFramework/actions/workflows/ui-tests.yml)
+[![UI Tests](https://github.com/CiprianIonutBoros/SeleniumFramework/actions/workflows/ui-tests.yml/badge.svg)](https://github.com/CiprianIonutBoros/SeleniumFramework/actions/workflows/ui-tests.yml)
 
 A **Selenium UI test automation framework** built with **.NET 8**, **NUnit 4**, and the **Page Object Model** pattern. Designed for parallel execution, easy extensibility, and clean separation between test logic and infrastructure. > **Target application:** [SauceDemo](https://www.saucedemo.com/) — a demo e-commerce site by Sauce Labs.
 Designed for **parallel execution**, **clean architecture**, **easy extensibility**, and **clear separation between test logic and infrastructure**.
 
-**Repository:** https://github.com/BrownBear9208/TestFramework
+**Repository:** https://github.com/CiprianIonutBoros/SeleniumFramework
 
 ---
 
-# 🏗 Architecture
+# Architecture
 
 ```mermaid
 flowchart TD
@@ -50,7 +50,7 @@ flowchart TD
 
 ---
 
-# 📁 Solution Structure
+# Solution Structure
 
 ```mermaid
 graph TD
@@ -115,7 +115,7 @@ graph TD
 
 ---
 
-# 🚀 Getting Started
+# Getting Started
 
 ## Prerequisites
 
@@ -126,7 +126,7 @@ graph TD
 ## Clone Repository
 
 ```bash
-git clone https://github.com/BrownBear9208/TestFramework.git
+git clone https://github.com/CiprianIonutBoros/SeleniumFramework.git
 cd TestFramework
 ```
 
@@ -172,7 +172,7 @@ BROWSER=Chrome dotnet test
 
 ---
 
-# 🎯 Run Specific Tests
+# Run Specific Tests
 
 ## Filter by Category
 
@@ -196,7 +196,7 @@ dotnet test -s UiTests/ci.runsettings
 
 ---
 
-# ⚙️ Configuration
+# Configuration
 
 ## `browserSettings.json`
 
@@ -233,7 +233,7 @@ Each user maps to a `UserType` enum value.
 
 ---
 
-# 🧩 Core Design Patterns
+# Core Design Patterns
 
 ## Page Object Model
 
@@ -293,7 +293,7 @@ Every test fixture inherits from `TestBase`, which handles:
 
 ---
 
-# 📊 Test Inventory
+# Test Inventory
 
 | Test Suite | Coverage Area | Count |
 |-----------|---------------|------:|
@@ -307,7 +307,7 @@ Every test fixture inherits from `TestBase`, which handles:
 
 ---
 
-# ➕ Adding a New Page
+# Adding a New Page
 
 ## 1. Create locators
 
@@ -344,7 +344,7 @@ Pages.NewPage.WaitToLoad();
 
 ---
 
-# 📦 Dependencies
+# Dependencies
 
 Managed centrally via `Directory.Packages.props`.
 
@@ -362,7 +362,7 @@ Managed centrally via `Directory.Packages.props`.
 
 ---
 
-# ✅ Framework Highlights
+# Framework Highlights
 
 - **.NET 8 + NUnit 4**
 - **Selenium Page Object Model**
@@ -376,7 +376,3 @@ Managed centrally via `Directory.Packages.props`.
 - **CI-friendly test execution**
 
 ---
-
-# 📝 License
-
-This project is for **educational and demonstration purposes**.
